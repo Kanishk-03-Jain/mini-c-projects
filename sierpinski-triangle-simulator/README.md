@@ -2,6 +2,10 @@
 
 A lightweight, interactive simulation demonstrating the construction of the [Sierpinski Triangle](https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle) fractal, written in C using the [raylib](https://www.raylib.com/) library.
 
+## Demo
+
+https://github.com/user-attachments/assets/879c029a-9e92-4271-ad86-15163dedac20
+
 ## Features
 
 - **Recursive Generation**: Watch the generation of the Sierpinski Triangle over time, level by level.
