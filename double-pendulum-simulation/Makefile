@@ -1,7 +1,7 @@
 build:
-	gcc -Wall -Wextra main.c -o main -lraylib 
+	gcc -Wall -Wextra ./src/main.c ./src/renderer.c ./src/simulation.c -o main -lraylib 
 run:
 	./main
 
 clean:
-	rm ./main
+	rm -f ./main
