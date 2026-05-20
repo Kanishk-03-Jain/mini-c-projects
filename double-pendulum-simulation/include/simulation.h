@@ -8,17 +8,16 @@
 #define G 9.8f
 #define MAX_TRAIL 150
 
-
 typedef struct {
-    float theta;    // angular position
-    float omega;    // angular velocity
-    float alpha;    // angular acceleration
+    float theta; // angular position
+    float omega; // angular velocity
+    float alpha; // angular acceleration
 
-    float length;     // length of the rod
-    float mass;       // mass of the bob
+    float length; // length of the rod
+    float mass;   // mass of the bob
 
-    Vector2 pivot;  // pivot position (start pos)
-    Vector2 bob;    // position of bob (end pos)
+    Vector2 pivot; // pivot position (start pos)
+    Vector2 bob;   // position of bob (end pos)
 } Pendulum;
 
 typedef struct {
@@ -33,7 +32,6 @@ typedef struct {
     Trail trail;
 } Simulation;
 
-
 Vector2 getBobPos(Pendulum *pendulum);
-void updatePosition(Simulation *sim, float dt);
+void updateSimulationState(Simulation *sim, float dt);
 void init(Simulation *sim);

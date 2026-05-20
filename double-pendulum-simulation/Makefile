@@ -1,5 +1,5 @@
 build:
-	gcc -Wall -Wextra ./src/main.c ./src/renderer.c ./src/simulation.c -o main -lraylib 
+	gcc -Wall -Wextra -I. -Iinclude ./src/main.c ./src/renderer.c ./src/simulation.c -o main -lraylib 
 run:
 	./main
 

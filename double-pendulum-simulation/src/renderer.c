@@ -10,32 +10,57 @@
 
 #pragma GCC diagnostic pop
 
-void drawPendulum(Pendulum *pendulum) {
+void drawPendulum(Pendulum* pendulum)
+{
     float visualRadius = BOB_RADIUS + (pendulum->mass * 0.5f);
     DrawLineEx(pendulum->pivot, pendulum->bob, LINE_THICKNESS, WHITE);
     DrawCircleV(pendulum->bob, visualRadius, RED);
 }
 
-void drawTrail(Simulation *sim) {
+void drawTrail(Simulation* sim)
+{
     for (int i = 0; i < sim->trail.count; i++) {
         float opacity = (float)i / sim->trail.count;
 
         DrawCircleV(
-            sim->trail.points[(i + sim->trail.head - sim->trail.count + MAX_TRAIL) % MAX_TRAIL], 
-            3, 
-            Fade(RED, opacity)
+        sim->trail.points[(i + sim->trail.head - sim->trail.count + MAX_TRAIL) %
+                            MAX_TRAIL],
+        3,
+        Fade(RED, opacity)
         );
     }
 }
 
-void renderUIPanel(Simulation *sim) {
-    DrawRectangle(10, HEIGHT - 170 + 10, 200, 150, Fade(DARKGRAY, 0.8f));
-    DrawText("CONTROLS", 20, HEIGHT - 170 + 20, 10, WHITE);
+void renderUIPanel(Simulation* sim)
+{
+    DrawRectangle(10, UI_PANEL_START + 10, 200, 150, Fade(DARKGRAY, 0.8f));
+    DrawText("CONTROLS", 20, UI_PANEL_START + 20, 10, WHITE);
 
-    GuiSlider((Rectangle){ 60, HEIGHT - 170 + 40, 100, 15}, "L1", TextFormat("%.0f", sim->p1.length), &sim->p1.length, 30, 300);
-    GuiSlider((Rectangle){ 60, HEIGHT - 170 + 65, 100, 15}, "L2", TextFormat("%.0f", sim->p2.length), &sim->p2.length, 30, 300);
-    GuiSlider((Rectangle){ 60, HEIGHT - 170 + 90, 100, 15}, "M1", TextFormat("%.0f", sim->p1.mass), &sim->p1.mass, 0.5f, 5.0f);
-    GuiSlider((Rectangle){ 60, HEIGHT - 170 + 115, 100, 15}, "M2", TextFormat("%.0f", sim->p2.mass), &sim->p2.mass, 0.5f, 5.0f);
+    GuiSlider((Rectangle){ 60, UI_PANEL_START + 40, 100, 15 },
+                "L1",
+                TextFormat("%.0f", sim->p1.length),
+                &sim->p1.length,
+                30,
+                300);
 
-    DrawText("Press SPACE to reset", 20, HEIGHT - 170 + 140, 10, LIGHTGRAY);
+    GuiSlider((Rectangle){ 60, UI_PANEL_START + 65, 100, 15 },
+                "L2",
+                TextFormat("%.0f", sim->p2.length),
+                &sim->p2.length,
+                30,
+                300);
+    GuiSlider((Rectangle){ 60, UI_PANEL_START + 90, 100, 15 },
+                "M1",
+                TextFormat("%.0f", sim->p1.mass),
+                &sim->p1.mass,
+                0.5f,
+                5.0f);
+    GuiSlider((Rectangle){ 60, UI_PANEL_START + 115, 100, 15 },
+                "M2",
+                TextFormat("%.0f", sim->p2.mass),
+                &sim->p2.mass,
+                0.5f,
+                5.0f);
+
+    DrawText("Press SPACE to reset", 20, UI_PANEL_START + 140, 10, LIGHTGRAY);
 }
