@@ -2,6 +2,9 @@
 
 A mini C project that visualizes the Fibonacci sequence and the Golden Spiral using [Raylib](https://www.raylib.com/).
 
+<img width="897" height="625" alt="image" src="https://github.com/user-attachments/assets/7ce8abb6-f1be-4d43-9c97-887f32c4c8bf" />
+
+
 ## Description
 
 This project calculates the Fibonacci sequence and graphically represents it by drawing a series of squares, where the side length of each square corresponds to a Fibonacci number. Inside each square, a quarter-circle arc is drawn, connecting to form the famous Golden Spiral.
