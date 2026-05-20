@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <math.h>
+#include <stdlib.h>
 
 #define WIDTH 900
 #define HEIGHT 600
@@ -13,16 +14,30 @@
 #define TIME_PER_FRAME 8
 #define MAX_TRAIL 150
 
-Vector2 trail[MAX_TRAIL];
-int trailHead;
-int trailCount;
+typedef struct {
+    float theta;    // angular position
+    float omega;    // angular velocity
+    float alpha;    // angular acceleration
 
-float theta1;
-float theta2;
-float omega1;
-float omega2;
-float alpha1;
-float alpha2;
+    int length;     // length of the rod
+    int mass;       // mass of the bob
+
+    Vector2 pivot;  // pivot position (start pos)
+    Vector2 bob;    // position of bob (end pos)
+} Pendulum;
+
+typedef struct {
+    Vector2 *points;
+    int head;
+    int count;
+} Trail;
+
+typedef struct {
+    Pendulum p1;
+    Pendulum p2;
+    Trail trail;
+} Simulation;
+
 
 Vector2 getEndPos(Vector2 pivot, int length, float theta) {
     float x_ = pivot.x + length * sinf(theta);
@@ -37,63 +52,71 @@ void drawPendulum(Vector2 pivot, int length, float theta) {
     DrawCircleV(endPos, BOB_RADIUS, RED);
 }
 
-void updatePosition(float dt) {
-    alpha1 = (-G*(2*M1+M2)*sinf(theta1) - M2*G*sinf(theta1-2*theta2) - 2*sinf(theta1-theta2)*M2*(omega2*omega2*L2+omega1*omega1*L1*cosf(theta1-theta2))) / (L1*(2*M1+M2-M2*cosf(2*theta1-2*theta2)));
-    alpha2 = (2*sinf(theta1-theta2)*(omega1*omega1*L1*(M1+M2)+G*(M1+M2)*cosf(theta1)+omega2*omega2*L2*M2*cosf(theta1-theta2))) / (L2*(2*M1+M2-M2*cosf(2*theta1-2*theta2)));
+void updatePosition(Simulation *sim, float dt) {
+    // updating angular accelerations
+    sim->p1.alpha = (-G*(2*M1+M2)*sinf(sim->p1.theta) - M2*G*sinf(sim->p1.theta-2*sim->p2.theta) - 2*sinf(sim->p1.theta-sim->p2.theta)*M2*(sim->p2.omega*sim->p2.omega*L2+sim->p1.omega*sim->p1.omega*L1*cosf(sim->p1.theta-sim->p2.theta))) / (L1*(2*M1+M2-M2*cosf(2*sim->p1.theta-2*sim->p2.theta)));
+    sim->p2.alpha = (2*sinf(sim->p1.theta-sim->p2.theta)*(sim->p1.omega*sim->p1.omega*L1*(M1+M2)+G*(M1+M2)*cosf(sim->p1.theta)+sim->p2.omega*sim->p2.omega*L2*M2*cosf(sim->p1.theta-sim->p2.theta))) / (L2*(2*M1+M2-M2*cosf(2*sim->p1.theta-2*sim->p2.theta)));
 
-    omega1 += alpha1 * dt;
-    omega2 += alpha2 * dt;
+    // updating angular velocities
+    sim->p1.omega += sim->p1.alpha * dt;
+    sim->p2.omega += sim->p2.alpha * dt;
 
-    theta1 += omega1 * dt;
-    theta2 += omega2 * dt;
+    // updating angular positions
+    sim->p1.theta += sim->p1.omega * dt;
+    sim->p2.theta += sim->p2.omega * dt;
 }
 
-void initPos() {
-    theta1 = GetRandomValue(-90, 90) * DEG2RAD;
-    theta2 = GetRandomValue(-90, 90) * DEG2RAD;
-    omega1 = 0;
-    omega2 = 0;
-    alpha1 = 0;
-    alpha2 = 0;
-    trailHead = 0;
-    trailCount = 0;
+void init(Simulation *sim) {
+    sim->p1.theta = GetRandomValue(-90, 90) * DEG2RAD;
+    sim->p2.theta = GetRandomValue(-90, 90) * DEG2RAD;
+    sim->p1.omega = 0;
+    sim->p2.omega = 0;
+    sim->p1.alpha = 0;
+    sim->p2.alpha = 0;
+
+    sim->trail.head = 0;
+    sim->trail.count = 0;
 }
 
 int main() {
+    Simulation sim;
+    sim.trail.points = (Vector2*)malloc(MAX_TRAIL * sizeof(Vector2));
+    
     InitWindow(WIDTH, HEIGHT, "Double pendulum Simulation");
     SetTargetFPS(60);
 
-    Vector2 pivot1 = (Vector2){WIDTH/2, 0};
-    initPos();
+    init(&sim);
+    sim.p1.pivot = (Vector2){WIDTH/2, 0};
     
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
-        updatePosition(dt*TIME_PER_FRAME);
+        updatePosition(&sim, dt*TIME_PER_FRAME);
         
         if (IsKeyPressed(KEY_SPACE)) {
-            initPos();
+            init(&sim);
         }
         
-        Vector2 bob1 = getEndPos(pivot1, L1, theta1);
-        Vector2 bob2 = getEndPos(bob1, L2, theta2);
-        trail[trailHead] = bob2;
-        trailHead = (trailHead + 1) % MAX_TRAIL;
+        sim.p1.bob = getEndPos(sim.p1.pivot, L1, sim.p1.theta);
+        sim.p2.pivot = sim.p1.bob;
+        sim.p2.bob = getEndPos(sim.p1.bob, L2, sim.p2.theta);
+        sim.trail.points[sim.trail.head] = sim.p2.bob;
+        sim.trail.head = (sim.trail.head + 1) % MAX_TRAIL;
 
-        if (trailCount < MAX_TRAIL) trailCount++;
+        if (sim.trail.count < MAX_TRAIL) sim.trail.count++;
         
         BeginDrawing();
             ClearBackground(BLACK);
 
             // pendulum 2
-            drawPendulum(bob1, L2, theta2);
+            drawPendulum(sim.p2.pivot, L2, sim.p2.theta);
 
             // draw pendulum 1
-            drawPendulum(pivot1, L1, theta1);
+            drawPendulum(sim.p1.pivot, L1, sim.p1.theta);
 
-            for (int i = 0; i < trailCount; i++) {
-                float opacity = (float)i / trailCount;
+            for (int i = 0; i < sim.trail.count; i++) {
+                float opacity = (float)i / sim.trail.count;
 
-                DrawCircleV(trail[(i + trailHead - trailCount + MAX_TRAIL) % MAX_TRAIL], 3, Fade(RED, opacity));
+                DrawCircleV(sim.trail.points[(i + sim.trail.head - sim.trail.count + MAX_TRAIL) % MAX_TRAIL], 3, Fade(RED, opacity));
             }
 
         EndDrawing();
