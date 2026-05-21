@@ -2,7 +2,6 @@
 #include "include/state.h"
 
 #include <raylib.h>
-#include <math.h>
 
 int main() {
     InitWindow(WIDTH, HEIGHT, "Fractal Tree Visualizer");
