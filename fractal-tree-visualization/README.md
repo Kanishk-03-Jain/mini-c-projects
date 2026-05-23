@@ -2,6 +2,8 @@
 
 A lightweight, interactive C program that visualizes the recursive generation of a fractal tree using the [raylib](https://www.raylib.com/) library.
 
+<img width="902" height="827" alt="image" src="https://github.com/user-attachments/assets/d1ed6f0e-81b8-459a-a960-1b2745b5aff9" />
+
 ## Features
 
 - **Recursive Generation**: The tree dynamically grows level by level over time, creating a visually appealing fractal structure.
