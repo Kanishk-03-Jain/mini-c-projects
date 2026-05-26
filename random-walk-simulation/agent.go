@@ -20,8 +20,8 @@ func (a *Agent) Draw() {
 	}
 }
 
-func updatePosition(num int, a *Agent, stepSize float32) {
-	switch num {
+func (a *Agent) Move(direction int, stepSize float32) {
+	switch direction {
 	case 0:
 		a.Position.X -= stepSize // Left
 	case 1:
@@ -35,14 +35,13 @@ func updatePosition(num int, a *Agent, stepSize float32) {
 	// Screen Wrapping
 	if a.Position.X < 0 {
 		a.Position.X = Width - stepSize
-	}
-	if a.Position.X >= Width {
+	} else if a.Position.X >= Width {
 		a.Position.X = 0
 	}
+
 	if a.Position.Y < 0 {
 		a.Position.Y = Height - stepSize
-	}
-	if a.Position.Y >= Height {
+	} else if a.Position.Y >= Height {
 		a.Position.Y = 0
 	}
 
@@ -54,13 +53,11 @@ func updatePosition(num int, a *Agent, stepSize float32) {
 }
 
 func (a *Agent) Update() {
-
-	rnum := rand.Intn(4)
+	direction := rand.Intn(4)
 	stepSize := a.Size.X
 
-	updatePosition(rnum, a, stepSize)
-	updatePosition(rnum, a, stepSize)
-
+	a.Move(direction, stepSize)
+	a.Move(direction, stepSize)
 }
 
 func NewAgent() Agent {
@@ -87,9 +84,8 @@ func NewAgent() Agent {
 }
 
 func initAgents() [NumAgents]Agent {
-	agents := [NumAgents]Agent{}
-
-	for i := range NumAgents {
+	var agents [NumAgents]Agent
+	for i := range agents {
 		agents[i] = NewAgent()
 	}
 	return agents

@@ -16,11 +16,12 @@ func main() {
 		if rl.IsKeyPressed(rl.KeySpace) {
 			agents = initAgents()
 		}
+
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
-		for idx := range NumAgents {
-			agents[idx].Draw()
-			agents[idx].Update()
+		for i := range agents {
+			agents[i].Draw()
+			agents[i].Update()
 		}
 
 		rl.DrawText(fmt.Sprintf("Number of Agents: %d", NumAgents), 10, 10, 20, rl.White)
